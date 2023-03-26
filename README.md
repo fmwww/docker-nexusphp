@@ -22,9 +22,4 @@ composer install
 ```shell
 cp -R nexus/Install/install public/
 ```
-6. `crontab -e`添加crontab脚本
-```
-* * * * * cd /www/nexusphp && php artisan schedule:run >> /tmp/schedule_DOMAIN.log
-* * * * * cd /www/nexusphp && php include/cleanup_cli.php >> /tmp/cleanup_cli_DOMAIN.log
-```
-
+6. 访问nexusphp.test
