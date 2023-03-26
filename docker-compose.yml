@@ -40,6 +40,7 @@ services:
     volumes:
       - ./services/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf # mysql配置
       - ./services/mysql/data:/var/lib/mysql # mysql数据
+    command: "--character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci"
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
