@@ -1,0 +1,57 @@
+version: '3.7'
+
+networks:
+  app:
+
+services:
+  nginx:
+    image: "nginx:alpine"
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - ./www:/www # 项目目录
+      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf # nginx配置
+      - ./services/nginx/sites:/etc/nginx/conf.d # 站点配置
+      - ./services/nginx/logs:/var/log/nginx # 日志
+    networks:
+      - app
+    depends_on:
+      - php8
+      - mysql
+
+  php8:
+    build:
+      context: ./services/php8
+      target: php
+    working_dir: /www
+    volumes:
+      - ./alpine/crontab:/ect/crontabs/root
+      - ./www:/www # 项目目录
+      - ./services/php8/php.ini:/usr/local/etc/php/php.ini # php配置
+      - ./services/php8/logs/error.log:/var/log/error.log # php错误日志
+      - ./services/php8/composer/:/root/.composer
+    networks:
+      - app
+
+  mysql:
+    image: "mariadb"
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - ./services/mysql/mysqld.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf # mysql配置
+      - ./services/mysql/data:/var/lib/mysql # mysql数据
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    networks:
+      - app
+
+  redis:
+    image: "redis:5.0.6-alpine"
+    command: "redis-server /usr/local/etc/redis/redis.conf --appendonly yes"
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - ./services/redis/data:/data # redis数据持久化
+      - ./services/redis/redis.conf:/usr/local/etc/redis/redis.conf # redis 配置文件
+    networks:
+      - app
